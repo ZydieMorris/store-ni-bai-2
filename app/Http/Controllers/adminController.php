@@ -53,7 +53,11 @@ class adminController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $categories = ProductCategory::all();
+
+        return Inertia::render('admin/Products', [
+            'categories' => $categories,
+        ]);
     }
 
     /**

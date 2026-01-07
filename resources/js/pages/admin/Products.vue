@@ -26,6 +26,14 @@ function saveCategory() {
   form.post('/category')
 }
 
+
+defineProps<{
+  categories: Array<{
+    id: number,
+    category_name: string 
+  }>
+}>();
+
 </script>
 
 
@@ -69,7 +77,6 @@ function saveCategory() {
               />
             
             </div>
-
             <DialogFooter class="mt-4 flex justify-end gap-2">
               <DialogClose as-child>
                 <Button variant="outline">Cancel</Button>
@@ -79,7 +86,10 @@ function saveCategory() {
           </form>
         </DialogContent>
       </Dialog>
+      </div>
 
+      <div v-for="item in categories" :key="item.id"  class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <p>{{ item.category_name }}</p>
       </div>
 
     </div>

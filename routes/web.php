@@ -11,6 +11,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::get('/products', [adminController::class, 'products']);
     Route::get('/stocks', [adminController::class, 'stocks']);
     Route::post('/category', [adminController::class, 'store']);
+    Route::get('/category', [adminController::class, 'show']);
 });
 
 Route::middleware(['auth', 'verified', 'cashier'])->group(function () {
