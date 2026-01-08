@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Button from '@/components/ui/button/Button.vue';
 import AdminLayout from '@/layouts/admin/Admin-Layout.vue';
-import { Plus } from 'lucide-vue-next';
+import { Plus, PrinterCheck } from 'lucide-vue-next';
 
 
 import {
@@ -38,7 +38,12 @@ onMounted(() => {
 });
 
 
-
+const form = useForm({
+    product_name: '',
+    category_id: activeCategoryId.value,
+    price: '',
+    image: '',
+})
 
 </script>
 
@@ -63,7 +68,7 @@ onMounted(() => {
           </button>
 
 
-      
+
         </div>
 
         <div class=" ">
@@ -77,13 +82,13 @@ onMounted(() => {
       </div>
 
 
-   
+
       <div class="w-full space-y-3 mt-5    bg-red-200 absolute top-50">
-      
+
         <div v-if="activeCategoryId !== null" class="text-center font-semibold text-3xl   ">
-             
+
               {{ categories.find(c => c.id === activeCategoryId)?.category_name }}
-    
+
         </div>
 
         <div class="flex justify-center items-center">
@@ -94,50 +99,56 @@ onMounted(() => {
 
         </div>
 
+        <!-- Add Product -->
+            <div class="flex justify-center items-center mt-10 ">
+                <Dialog >
+                <form>
+                <DialogTrigger as-child>
+                    <Button class="h-30 w-40">
+                    <Plus/> Add Menu
+                    </Button>
+                </DialogTrigger>
+                <DialogContent class="sm:max-w-[625px]">
+                    <DialogHeader>
+                    <DialogTitle>Add New Menu ( {{ categories.find(c => c.id === activeCategoryId)?.category_name }} )</DialogTitle>
+                    <DialogDescription>
 
-            <div class="flex justify-center items-center mt-10">
-              <Dialog>
-    <form>
-      <DialogTrigger as-child>
-        <Button class="h-30 w-40">
-         <Plus/> Add Menu
-        </Button>
-      </DialogTrigger>
-      <DialogContent class="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Add New Menu ( {{ categories.find(c => c.id === activeCategoryId)?.category_name }} )</DialogTitle>
-          <DialogDescription>
-           
-          </DialogDescription>
-        </DialogHeader>
-        <div class="grid gap-4">
-          <div class="grid gap-3">
-            <Label for="name-1">Name</Label>
-            <Input id="name-1" name="name" default-value="Pedro Duarte" />
+                    </DialogDescription>
+                    </DialogHeader>
+                    <div class="flex justify-between p-3">
+                    <div class="grid gap-3">
+                        <Label for="name-1">Product Name</Label>
+                        <Input class="w-70 h-12" />
+                    </div>
+                    <div class="grid gap-3">
+                        <Label >Price</Label>
+                        <Input  class="h-12"/>
+                    </div>
+                    </div>
+
+                    <div class="space-y-2">
+
+                        <Label>Choose Image</Label>
+                        <Input type="file" class="h-12"/>
+                    </div>
+                    <DialogFooter>
+                    <DialogClose as-child>
+                        <Button variant="outline">
+                        Cancel
+                        </Button>
+                    </DialogClose>
+                    <Button type="submit">
+                        Save
+                    </Button>
+                    </DialogFooter>
+                </DialogContent>
+                </form>
+            </Dialog>
           </div>
-          <div class="grid gap-3">
-            <Label for="username-1">Username</Label>
-            <Input id="username-1" name="username" default-value="@peduarte" />
-          </div>
-        </div>
-        <DialogFooter>
-          <DialogClose as-child>
-            <Button variant="outline">
-              Cancel
-            </Button>
-          </DialogClose>
-          <Button type="submit">
-            Save changes
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </form>
-  </Dialog>
-          </div>
-      
+
       </div>
 
-     
+
 
 
 
