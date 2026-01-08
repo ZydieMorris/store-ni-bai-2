@@ -9,9 +9,12 @@ Route::redirect('/', '/login')->name('home');
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::get('/dashboard', [adminController::class, 'index']);
     Route::get('/products', [adminController::class, 'products']);
-    Route::get('/stocks', [adminController::class, 'stocks']);
-    Route::post('/category', [adminController::class, 'store']);
-    Route::get('/category', [adminController::class, 'show']);
+    Route::get('/manage-stocks', [adminController::class, 'stocks']);
+    Route::post('/products/categories', [adminController::class, 'store']);
+    Route::get('/manage-categories', [adminController::class, 'categories']);
+    Route::delete('/products/categories/{categories}', [adminController::class, 'destroy']);
+    Route::put('/products/categories/{categories}', [adminController::class, 'update']);
+
 });
 
 Route::middleware(['auth', 'verified', 'cashier'])->group(function () {

@@ -21,12 +21,26 @@ class adminController extends Controller
      */
     public function products()
     {
-        return Inertia::render('admin/Products');
+        $categories = ProductCategory::all();
+
+        return Inertia::render('admin/Products', [
+            'categories' => $categories,
+        ]);
+    }
+
+    public function categories()
+    {
+
+        $categories = ProductCategory::all();
+
+        return Inertia::render('admin/ManageCategories', [
+            'categories' => $categories,
+        ]);
     }
 
     public function stocks()
     {
-        return Inertia::render('admin/Stocks');
+        return Inertia::render('admin/ManageStocks');
     }
 
     public function create()
@@ -45,14 +59,15 @@ class adminController extends Controller
 
         ProductCategory::create($validated);
 
-        return back();
+        return redirect('/manage-categories');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function showCategories()
     {
+
         $categories = ProductCategory::all();
 
         return Inertia::render('admin/Products', [
@@ -60,27 +75,37 @@ class adminController extends Controller
         ]);
     }
 
+    public function show(string $id) {}
+
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        //
+        
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, ProductCategory $categories)
     {
-        //
+        $validated = $request->validate([
+            'category_name' => 'required',
+        ]);
+
+        ProductCategory::where('id', $categories->id)->update($validated);
+
+        return redirect('/manage-categories');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(ProductCategory $categories)
     {
-        //
+        $categories->delete();
+
+        return redirect('/manage-categories');
     }
 }

@@ -16,23 +16,29 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useForm } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
+import { onMounted, ref } from 'vue';
 
-const form = useForm({
-  category_name: '',
-})
 
-function saveCategory() {
-  form.post('/category')
+
+interface Category {
+  id: number
+  category_name: string
 }
 
 
-defineProps<{
-  categories: Array<{
-    id: number,
-    category_name: string 
-  }>
-}>();
+const { categories } = defineProps<{ categories: Category[] }>()
+
+const activeCategoryId = ref<number | null>(null);
+
+onMounted(() => {
+  if (categories.length) {
+    activeCategoryId.value = categories[0].id
+  }
+});
+
+
+
 
 </script>
 
@@ -42,57 +48,105 @@ defineProps<{
 <template>
   <AdminLayout>
 
-    <!-- Your page content here -->
-    <div class="flex  items-end justify-end pt-35 pr-20 pl-50 mx-auto bg-amber-500">
+    <div class="flex   ml-100 relative w-350  ">
+
+      <!-- Tab Area -->
+      <div class=" flex justify-between mt-35  space-x-15 w-full ">
+
+        <div class="space-x-15">
+
+          <button v-for="category in categories" :key="category.id" @click="activeCategoryId = category.id"
+            class="pb-2 font-bold " :class="activeCategoryId === category.id
+              ? 'border-b-2 border-black'
+              : 'text-gray-400'">
+            {{ category.category_name }}
+          </button>
 
 
-      <div>
+      
+        </div>
+
+        <div class=" ">
+          <Link href="/manage-categories">
+            <Button>
+              <Plus /> Manage Categories
+            </Button>
+
+          </Link>
+        </div>
+      </div>
 
 
-   <Dialog>
-        <!-- Trigger button -->
-        <DialogTrigger as-child>
-          <Button variant="outline">
-            <Plus /> Manage Categories
+   
+      <div class="w-full space-y-3 mt-5    bg-red-200 absolute top-50">
+      
+        <div v-if="activeCategoryId !== null" class="text-center font-semibold text-3xl   ">
+             
+              {{ categories.find(c => c.id === activeCategoryId)?.category_name }}
+    
+        </div>
+
+        <div class="flex justify-center items-center">
+
+            <Link href="/manage-stocks">
+                                  <Button> <Plus/> Manage Stocks</Button>
+            </Link>
+
+        </div>
+
+
+            <div class="flex justify-center items-center mt-10">
+              <Dialog>
+    <form>
+      <DialogTrigger as-child>
+        <Button class="h-30 w-40">
+         <Plus/> Add Menu
+        </Button>
+      </DialogTrigger>
+      <DialogContent class="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Add New Menu ( {{ categories.find(c => c.id === activeCategoryId)?.category_name }} )</DialogTitle>
+          <DialogDescription>
+           
+          </DialogDescription>
+        </DialogHeader>
+        <div class="grid gap-4">
+          <div class="grid gap-3">
+            <Label for="name-1">Name</Label>
+            <Input id="name-1" name="name" default-value="Pedro Duarte" />
+          </div>
+          <div class="grid gap-3">
+            <Label for="username-1">Username</Label>
+            <Input id="username-1" name="username" default-value="@peduarte" />
+          </div>
+        </div>
+        <DialogFooter>
+          <DialogClose as-child>
+            <Button variant="outline">
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button type="submit">
+            Save changes
           </Button>
-        </DialogTrigger>
-
-        <!-- Dialog content -->
-        <DialogContent class="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Create Category</DialogTitle>
-            <DialogDescription>
-              Enter a name for your new product category.
-            </DialogDescription>
-          </DialogHeader>
-
-          <!-- Form -->
-          <form @submit.prevent="saveCategory" class="mt-4">
-            <div class="grid gap-2">
-              <Label for="category_name">Category Name</Label>
-              <Input
-                id="category_name"
-                name="category_name"
-                v-model="form.category_name"
-              />
-            
-            </div>
-            <DialogFooter class="mt-4 flex justify-end gap-2">
-              <DialogClose as-child>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button type="submit">Save</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+        </DialogFooter>
+      </DialogContent>
+    </form>
+  </Dialog>
+          </div>
+      
       </div>
 
-      <div v-for="item in categories" :key="item.id"  class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <p>{{ item.category_name }}</p>
-      </div>
+     
+
+
+
 
     </div>
+
+
+
+
 
   </AdminLayout>
 </template>
