@@ -19,15 +19,24 @@ import { Label } from '@/components/ui/label'
 import { Link, useForm } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
 
-
+interface Products {
+  id: number
+  product_name: string
+  price: number
+  image: string
+  product_category_id: number
+}
 
 interface Category {
   id: number
   category_name: string
 }
+const { categories, products } = defineProps<{
+  categories: Category[],
+  products: Products[]
+}>()
 
 
-const { categories } = defineProps<{ categories: Category[] }>()
 
 const activeCategoryId = ref<number | null>(null);
 
@@ -38,17 +47,32 @@ onMounted(() => {
 });
 
 
+
+
 const form = useForm({
-    product_name: '',
-    category_id: activeCategoryId.value,
-    price: '',
-    image: '',
+  product_name: '',
+  category_id: activeCategoryId.value,
+  price: '',
+  image: null as File | null,
 })
 
+const onImageChange = (e: Event) => {
+  const target = e.target as HTMLInputElement
+  form.image = target.files?.[0] ?? null
+}
+
+
+function saveProduct() {
+  form.post('/add-menu', {
+    onSuccess: () => {
+      window.location.reload()
+    }
+  }
+
+  )
+}
+
 </script>
-
-
-
 
 <template>
   <AdminLayout>
@@ -66,9 +90,6 @@ const form = useForm({
               : 'text-gray-400'">
             {{ category.category_name }}
           </button>
-
-
-
         </div>
 
         <div class=" ">
@@ -81,83 +102,96 @@ const form = useForm({
         </div>
       </div>
 
-
-
-      <div class="w-full space-y-3 mt-5    bg-red-200 absolute top-50">
+      <!-- Catgeroy Content -->
+      <div class="w-full space-y-3 mt-5 absolute top-50">
 
         <div v-if="activeCategoryId !== null" class="text-center font-semibold text-3xl   ">
+          {{categories.find(c => c.id === activeCategoryId)?.category_name}}
 
-              {{ categories.find(c => c.id === activeCategoryId)?.category_name }}
+
 
         </div>
 
+        <!-- Manage Stocks -->
         <div class="flex justify-center items-center">
 
-            <Link href="/manage-stocks">
-                                  <Button> <Plus/> Manage Stocks</Button>
-            </Link>
+          <Link :href="`/manage-stocks?category_id=${activeCategoryId}`">
+            <Button>
+              <Plus /> Manage Stocks
+            </Button>
+          </Link>
+
+
+
 
         </div>
 
         <!-- Add Product -->
-            <div class="flex justify-center items-center mt-10 ">
-                <Dialog >
-                <form>
-                <DialogTrigger as-child>
-                    <Button class="h-30 w-40">
-                    <Plus/> Add Menu
+        <div class="flex justify-end items-end mt-10 ">
+          <Dialog>
+
+            <DialogTrigger as-child>
+              <Button class="h-30 w-40 " @click="form.category_id = activeCategoryId">
+                <Plus /> Add Menu
+              </Button>
+            </DialogTrigger>
+            <DialogContent class="sm:max-w-[625px]">
+              <DialogHeader>
+                <DialogTitle>Add New Menu ( {{categories.find(c => c.id === activeCategoryId)?.category_name}} )
+                </DialogTitle>
+                <DialogDescription>
+
+                </DialogDescription>
+              </DialogHeader>
+              <form @submit.prevent="saveProduct">
+                <div class="flex justify-between p-3">
+                  <div class="grid gap-3">
+                    <Label for="name-1">Product Name</Label>
+                    <Input v-model="form.product_name" class="w-70 h-12" />
+                  </div>
+                  <div class="grid gap-3">
+                    <Label>Price</Label>
+                    <Input v-model="form.price" class="h-12" />
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+
+                  <Label>Choose Image</Label>
+                  <Input type="file" name="image" accept="image/*" @change="onImageChange" class="h-12" />
+                </div>
+                <DialogFooter>
+                  <DialogClose as-child>
+                    <Button variant="outline">
+                      Cancel
                     </Button>
-                </DialogTrigger>
-                <DialogContent class="sm:max-w-[625px]">
-                    <DialogHeader>
-                    <DialogTitle>Add New Menu ( {{ categories.find(c => c.id === activeCategoryId)?.category_name }} )</DialogTitle>
-                    <DialogDescription>
+                  </DialogClose>
+                  <Button type="submit">
+                    Save
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
 
-                    </DialogDescription>
-                    </DialogHeader>
-                    <div class="flex justify-between p-3">
-                    <div class="grid gap-3">
-                        <Label for="name-1">Product Name</Label>
-                        <Input class="w-70 h-12" />
-                    </div>
-                    <div class="grid gap-3">
-                        <Label >Price</Label>
-                        <Input  class="h-12"/>
-                    </div>
-                    </div>
+          </Dialog>
 
-                    <div class="space-y-2">
-
-                        <Label>Choose Image</Label>
-                        <Input type="file" class="h-12"/>
-                    </div>
-                    <DialogFooter>
-                    <DialogClose as-child>
-                        <Button variant="outline">
-                        Cancel
-                        </Button>
-                    </DialogClose>
-                    <Button type="submit">
-                        Save
-                    </Button>
-                    </DialogFooter>
-                </DialogContent>
-                </form>
-            </Dialog>
+          <div v-for="product in products" :key="product.id">
+            <p>
+              {{ product.product_name }}
+            </p>
           </div>
+        </div>
+
+        <div>
+
+        </div>
+
+
 
       </div>
 
 
 
-
-
-
     </div>
-
-
-
-
-
   </AdminLayout>
 </template>

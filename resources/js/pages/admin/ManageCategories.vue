@@ -59,7 +59,7 @@ function deleteCategory(id: number) {
 function editCategory(id: number) {
     form.put(`/products/categories/${id}`, {
         onSuccess: () => {
-            
+           
             window.location.reload();
         }
     })

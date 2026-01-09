@@ -16,11 +16,11 @@ return new class extends Migration
             $table->string('product_name');
             $table->foreignId('product_category_id')->constrained()->onDelete('cascade');
             $table->string('price');
-            $table->binary('image');
+            $table->string('image')->nullable();
              $table->timestamps();
         });
     }
-
+    
     /**
      * Reverse the migrations.
      */
