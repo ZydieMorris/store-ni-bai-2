@@ -118,9 +118,11 @@ class adminController extends Controller
     {
 
         $categories = ProductCategory::all();
+        $products = Product::all();
 
         return Inertia::render('admin/Products', [
             'categories' => $categories,
+            'products' => $products,
         ]);
     }
 

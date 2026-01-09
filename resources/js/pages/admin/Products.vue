@@ -49,6 +49,7 @@ onMounted(() => {
 
 
 
+
 const form = useForm({
   product_name: '',
   category_id: activeCategoryId.value,
@@ -94,7 +95,7 @@ function saveProduct() {
 
         <div class=" ">
           <Link href="/manage-categories">
-            <Button>
+            <Button class="bg-[#254F81]">
               <Plus /> Manage Categories
             </Button>
 
@@ -116,7 +117,7 @@ function saveProduct() {
         <div class="flex justify-center items-center">
 
           <Link :href="`/manage-stocks?category_id=${activeCategoryId}`">
-            <Button>
+            <Button class="bg-[#254F81]">
               <Plus /> Manage Stocks
             </Button>
           </Link>
@@ -131,7 +132,7 @@ function saveProduct() {
           <Dialog>
 
             <DialogTrigger as-child>
-              <Button class="h-30 w-40 " @click="form.category_id = activeCategoryId">
+              <Button class="h-30 w-40 bg-[#254F81]" @click="form.category_id = activeCategoryId">
                 <Plus /> Add Menu
               </Button>
             </DialogTrigger>
@@ -182,10 +183,7 @@ function saveProduct() {
           </div>
         </div>
 
-        <div>
-
-        </div>
-
+       
 
 
       </div>
