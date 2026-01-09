@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Link, useForm } from '@inertiajs/vue3';
+import { Link, router, useForm } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
 
 interface Products {
@@ -73,6 +73,15 @@ function saveProduct() {
   )
 }
 
+const changeCategory = (categoryId: number) => {
+  activeCategoryId.value = categoryId
+  router.reload({
+    data: {
+      category_id: categoryId
+    }
+  })
+};
+
 </script>
 
 <template>
@@ -85,7 +94,7 @@ function saveProduct() {
 
         <div class="space-x-15">
 
-          <button v-for="category in categories" :key="category.id" @click="activeCategoryId = category.id"
+          <button v-for="category in categories" :key="category.id" @click="changeCategory(category.id)"
             class="pb-2 font-bold " :class="activeCategoryId === category.id
               ? 'border-b-2 border-black'
               : 'text-gray-400'">
@@ -180,10 +189,15 @@ function saveProduct() {
             <p>
               {{ product.product_name }}
             </p>
+            <p>
+              {{ product.price }}
+            </p>
+
+            <img :src="product.image" class="w-40 h-40" />
           </div>
         </div>
 
-       
+
 
 
       </div>

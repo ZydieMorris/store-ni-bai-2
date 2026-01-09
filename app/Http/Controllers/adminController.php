@@ -24,8 +24,13 @@ class adminController extends Controller
     {
         $categories = ProductCategory::all();
 
+        $filterCat = request()->query('category_id');
+
+        $firtsCat = $categories->first();
+
         return Inertia::render('admin/Products', [
             'categories' => $categories,
+            'products' => Product::where('product_category_id', $filterCat ?? $firtsCat->id)->get(),
         ]);
     }
 
@@ -98,18 +103,17 @@ class adminController extends Controller
         ]);
     }
 
-   public function manageStocks(Request $request)
-{
-    $categoryId = $request->query('category_id');
+    public function manageStocks(Request $request)
+    {
+        $categoryId = $request->query('category_id');
 
-    $products = Product::where('product_category_id', $categoryId)->get();
+        $products = Product::where('product_category_id', $categoryId)->get();
 
-    return Inertia::render('admin/ManageStocks', [
-        'products' => $products,
-        'categoryId' => $categoryId,
-    ]);
-}
-
+        return Inertia::render('admin/ManageStocks', [
+            'products' => $products,
+            'categoryId' => $categoryId,
+        ]);
+    }
 
     /**
      * Display the specified resource.
@@ -147,18 +151,17 @@ class adminController extends Controller
         return redirect('/manage-categories');
     }
 
-   public function addStocks(Request $request, Product $product)
-{
-    $validated = $request->validate([
-        'stock' => 'required|integer|min:1',
-    ]);
+    public function addStocks(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'stock' => 'required|integer|min:1',
+        ]);
 
-    // Increment stock
-    $product->increment('stock', $validated['stock']);
+        // Increment stock
+        $product->increment('stock', $validated['stock']);
 
-    return redirect('/manage-stocks')->with('success', 'Stock added successfully');
-}
-
+        return redirect('/manage-stocks')->with('success', 'Stock added successfully');
+    }
 
     /**
      * Remove the specified resource from storage.
