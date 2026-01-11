@@ -10,7 +10,7 @@ function logout() {
 
 </script>
 <template>
-    <div class="min-h-screen bg-[#254F81] w-70 text-white  absolute top-0">
+    <div class="min-h-screen bg-[#254F81] w-70 text-white  fixed top-0 z-100">
 
         <h1 class="text-center pt-10 text-2xl font-semibold">Hello Admin</h1>
 

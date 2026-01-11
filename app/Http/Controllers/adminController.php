@@ -20,19 +20,21 @@ class adminController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function products()
-    {
-        $categories = ProductCategory::all();
+   public function products()
+{
+    $categories = ProductCategory::all();
 
-        $filterCat = request()->query('category_id');
+    $filterCat = request()->query('category_id');
 
-        $firtsCat = $categories->first();
+    $firstCat = $categories->first();
 
-        return Inertia::render('admin/Products', [
-            'categories' => $categories,
-            'products' => Product::where('product_category_id', $filterCat ?? $firtsCat->id)->get(),
-        ]);
-    }
+    return Inertia::render('admin/Products', [
+        'categories' => $categories,
+        'products' => $firstCat
+            ? Product::where('product_category_id', $filterCat ?? $firstCat->id)->get()
+            : [],
+    ]);
+}
 
     public function categories()
     {
@@ -74,6 +76,7 @@ class adminController extends Controller
             'product_name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:product_categories,id',
+            'stock_available' => 'required|integer|min:0',
             'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
@@ -87,6 +90,7 @@ class adminController extends Controller
             'product_name' => $validated['product_name'],
             'price' => $validated['price'],
             'product_category_id' => $validated['category_id'],
+            'stock_available' => $validated['stock_available'],
             'image' => 'images/'.$filename,
         ]);
 
@@ -97,9 +101,11 @@ class adminController extends Controller
     {
 
         $products = Product::all();
+        $categories = ProductCategory::where();
 
         return Inertia::render('admin/ManageStocks', [
             'products' => $products,
+            'categories' => $categories,
         ]);
     }
 
@@ -109,9 +115,12 @@ class adminController extends Controller
 
         $products = Product::where('product_category_id', $categoryId)->get();
 
+        $categories = ProductCategory::all();
+
         return Inertia::render('admin/ManageStocks', [
             'products' => $products,
             'categoryId' => $categoryId,
+            'categories' => $categories,
         ]);
     }
 
@@ -154,13 +163,44 @@ class adminController extends Controller
     public function addStocks(Request $request, Product $product)
     {
         $validated = $request->validate([
-            'stock' => 'required|integer|min:1',
+            'stock_to_add' => 'required|integer|min:1',
         ]);
 
         // Increment stock
-        $product->increment('stock', $validated['stock']);
+        $product->increment('stock_available', $validated['stock_to_add']);
+       return redirect('/manage-stocks?category_id=' . $product->product_category_id);
 
-        return redirect('/manage-stocks')->with('success', 'Stock added successfully');
+    }
+
+    public function showStocks(){
+        $products = Product::all();
+
+        return Inertia::render('admin/ManageStocks', [
+            'products' => $products,
+        ]);
+    }
+
+    public function editProduct(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'product_name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+
+        // Handle image upload if a new image is provided
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $filename = time().'.'.$image->getClientOriginalExtension();
+            $image->move(public_path('images'), $filename);
+            $validated['image'] = 'images/'.$filename;
+        }
+      
+        // Update product
+        Product::where('id', $product->id)->update($validated);
+
+        return redirect('/manage-stocks?category_id=' . $product->product_category_id);
     }
 
     /**

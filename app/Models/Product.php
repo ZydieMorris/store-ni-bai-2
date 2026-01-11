@@ -11,6 +11,14 @@ class Product extends Model
     'price',
     'product_category_id',
     'image',
+    'stock_available',
 ];
+
+public function getImageAttribute($value)
+{
+    return $value ? asset($value) : null;
+}
+
+
 
 }

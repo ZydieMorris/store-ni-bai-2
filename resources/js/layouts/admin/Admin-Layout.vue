@@ -1,8 +1,9 @@
 <template>
     <div class="max-w-[1920px]">
+        <Sidebar/>
         <Header/>
         <slot />
-        <Sidebar/>
+
     </div>
 </template>
 

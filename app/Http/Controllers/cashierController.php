@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -12,7 +13,13 @@ class cashierController extends Controller
      */
     public function index()
     {
-        return Inertia::render('cashier/Dashboard');
+
+   $categories = ProductCategory::with('products')->get();
+
+        return Inertia::render('cashier/Dashboard', [
+            'categories' => $categories,
+
+        ]);
     }
 
     /**

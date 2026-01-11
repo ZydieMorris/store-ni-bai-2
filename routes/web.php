@@ -28,6 +28,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::delete('/product/{product}', [adminController::class, 'destroyProduct']);
     Route::post('/product/add-stock/{product}', [adminController::class, 'addStocks']);
     Route::get('/manage-stocks', [adminController::class, 'manageStocks']);
+    Route::put('/product/edit/{product}', [adminController::class, 'editProduct']);
 
 });
 
