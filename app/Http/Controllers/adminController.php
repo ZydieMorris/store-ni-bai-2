@@ -20,21 +20,21 @@ class adminController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-   public function products()
-{
-    $categories = ProductCategory::all();
+    public function products()
+    {
+        $categories = ProductCategory::all();
 
-    $filterCat = request()->query('category_id');
+        $filterCat = request()->query('category_id');
 
-    $firstCat = $categories->first();
+        $firstCat = $categories->first();
 
-    return Inertia::render('admin/Products', [
-        'categories' => $categories,
-        'products' => $firstCat
-            ? Product::where('product_category_id', $filterCat ?? $firstCat->id)->get()
-            : [],
-    ]);
-}
+        return Inertia::render('admin/Products', [
+            'categories' => $categories,
+            'products' => $firstCat
+                ? Product::where('product_category_id', $filterCat ?? $firstCat->id)->get()
+                : [],
+        ]);
+    }
 
     public function categories()
     {
@@ -168,11 +168,13 @@ class adminController extends Controller
 
         // Increment stock
         $product->increment('stock_available', $validated['stock_to_add']);
-       return redirect('/manage-stocks?category_id=' . $product->product_category_id);
+
+        return redirect('/manage-stocks?category_id='.$product->product_category_id);
 
     }
 
-    public function showStocks(){
+    public function showStocks()
+    {
         $products = Product::all();
 
         return Inertia::render('admin/ManageStocks', [
@@ -188,7 +190,6 @@ class adminController extends Controller
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-
         // Handle image upload if a new image is provided
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -196,11 +197,11 @@ class adminController extends Controller
             $image->move(public_path('images'), $filename);
             $validated['image'] = 'images/'.$filename;
         }
-      
+
         // Update product
         Product::where('id', $product->id)->update($validated);
 
-        return redirect('/manage-stocks?category_id=' . $product->product_category_id);
+        return redirect('/manage-stocks?category_id='.$product->product_category_id);
     }
 
     /**
@@ -217,6 +218,6 @@ class adminController extends Controller
     {
         $product->delete();
 
-        return redirect('/manage-stocks');
+        return redirect('/manage-stocks'.'?category_id='.$product->product_category_id);
     }
 }

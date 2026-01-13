@@ -192,10 +192,10 @@ const changeCategory = (categoryId: number) => {
           </Dialog>
         </div>
 
-<div class="grid grid-cols-6 gap-2 mt-10">
+<div class="grid grid-cols-5  gap-2 space-y-5 mt-10">
 
 
-    <div v-for="product in products" :key="product.id" class="w-50 relative  h-auto shadow-xl rounded">
+    <div v-for="product in products" :key="product.id" class="w-60 relative bg-white  h-60 shadow-xl rounded">
 
 
         <p class="absolute right-0 bg-[#254F81] p-2 px-5 rounded-b text-white font-semibold">₱ {{ product.price }}.00</p>

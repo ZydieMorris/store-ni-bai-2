@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/login')->name('home');
 
 Route::get('/redirect', function () {
-    if(auth()->user()->role == 'admin'){
+    if (auth()->user()->role == 'admin') {
         return redirect('/dashboard');
-    } elseif(auth()->user()->role == 'cashier'){
+    } elseif (auth()->user()->role == 'cashier') {
         return redirect('/cashier/dashboard');
     } else {
         abort(403);
@@ -34,6 +34,10 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
 Route::middleware(['auth', 'verified', 'cashier'])->group(function () {
     Route::get('/cashier/dashboard', [cashierController::class, 'index']);
+    Route::post('/cart/add', [cashierController::class, 'addToCart']);
+    Route::get('/cart/show', [cashierController::class, 'showCart']);
+    Route::delete('/cart/delete/{cartItem}', [cashierController::class, 'deleteCartItems']);
+    Route::post('/cart/pay', [cashierController::class, 'payOrder']);
 
 });
 

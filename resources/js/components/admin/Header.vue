@@ -2,7 +2,7 @@
 
 </script>
 <template>
-    <div class="w-full shadow-xl bg-[#FEFEFE] h-20 fixed">
+    <div class="w-full shadow-xl bg-[#FEFEFE] z-50 h-20 fixed">
         
     </div>
 </template>
