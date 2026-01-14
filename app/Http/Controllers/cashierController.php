@@ -155,7 +155,7 @@ class cashierController extends Controller
 
     public function receipt(Request $request)
     {
-        dd($request);
+     
 
         $order = Order::findOrFail($request->input('order_id'));
 
