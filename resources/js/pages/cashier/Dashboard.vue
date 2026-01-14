@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog'
 import { products } from '@/actions/App/Http/Controllers/adminController';
 
+import Label from '@/components/ui/label/Label.vue';
 
 
 
@@ -61,14 +62,20 @@ const form = useForm({
   amount_paid: 0
 })
 
+const noOrder = computed(() => cartItems.length === 0);
+
+
 function addToCart(product: Products) {
   form.product_id = product.id;
   form.unit_price = product.price;
   form.product_quantity = form.product_quantity;
 
+
+
   form.post('/cart/add', {
     onSuccess: () => {
-      window.location.reload();;
+      window.location.reload();
+
     }
   })
 }
@@ -76,6 +83,7 @@ function addToCart(product: Products) {
 
 import { computed } from 'vue'
 import { Trash } from 'lucide-vue-next';
+import CashierLayout from '@/layouts/cashier/Cashier-Layout.vue';
 
 
 const totalAmount = computed(() => {
@@ -89,12 +97,16 @@ function cancelOrder(cartItemId: number) {
   router.delete(`/cart/delete/${cartItemId}`)
 }
 
-function payOrder() {
- 
-  router.post('/cart/pay', {
+function deleteOrder() {
+  router.delete('/cart/clear')
+}
+
+function cashierPay() {
+
+  router.post('/cashier/pay', {
     amount_paid: form.amount_paid
   }
-    
+
   )
 }
 
@@ -102,17 +114,9 @@ function payOrder() {
 
 </script>
 <template>
-  <div class="max-w-[1920px] mx-auto min-h-screen bg-gray-300">
+  <CashierLayout class="max-w-[1920px] mx-auto min-h-screen bg-gray-300">
     <!-- Header -->
-    <div class="w-full   h-20 z-20  flex items-center bg-white justify-between px-10 shadow-xl">
-      <div class="text-[#254F81] font-bold text-2xl">
-        <p>Store ni Bai</p>
-      </div>
 
-      <div>
-        <Button class="bg-[#254F81]" @click="logout">Logout</Button>
-      </div>
-    </div>
     <!-- Search bar -->
     <div class="flex gap-5 mt-20 px-20">
       <div>
@@ -231,7 +235,7 @@ function payOrder() {
 
       <!-- Bill Summary -->
       <div class="w-100 h-auto bg-white rounded-lg shadow-xl p-5">
-        <h1 class="text-center font-bold text-2xl">Bill Summary</h1>
+        <h1 class="text-center font-bold text-2xl">Cart Summary</h1>
 
         <div>
           <table class="mt-5 border-b">
@@ -245,13 +249,22 @@ function payOrder() {
               </tr>
             </thead>
 
-            <tbody v-for="cartItem in cartItems" :key="cartItem.id" class="h-12 align-middle ">
-              <td class="text-center ">{{ cartItem.product.product_name }}</td>
-              <td class="text-center">{{ cartItem.product_quantity }}</td>
-              <td class="text-center ">₱ {{ cartItem.product.price * cartItem.product_quantity }}</td>
-              <td class="text-center "><Button variant="destructive" @click="cancelOrder(cartItem.id)">
-                  <Trash />
-                </Button></td>
+            <tbody>
+              <tr v-if="noOrder">
+                <td colspan="4" class="text-center p-5">No order yet. Please add items to the cart.</td>
+              </tr>
+
+              <tr v-else v-for="cartItem in cartItems" :key="cartItem.id" class="h-12 align-middle ">
+
+                <td class="text-center ">{{ cartItem.product.product_name }}</td>
+                <td class="text-center">{{ cartItem.product_quantity }}</td>
+                <td class="text-center ">₱ {{ cartItem.product.price * cartItem.product_quantity }}</td>
+                <td class="text-center "><Button variant="destructive" @click="cancelOrder(cartItem.id)">
+                    <Trash />
+                  </Button></td>
+              </tr>
+
+
             </tbody>
           </table>
 
@@ -262,19 +275,17 @@ function payOrder() {
 
           <!-- <div>
             <h1>Mode of Payment</h1>
-
-
           </div> -->
 
           <div class="flex flex-col mt-5 space-y-2">
 
             <Dialog>
-             
-                <DialogTrigger asChild>
-                  <Button class="w-full">Pay Order</Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                 <form @submit.prevent="payOrder">
+
+              <DialogTrigger asChild>
+                <Button class="w-full">Pay Order</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <form @submit.prevent="cashierPay()">
                   <DialogHeader>
                     <DialogTitle></DialogTitle>
                     <DialogDescription>
@@ -288,25 +299,22 @@ function payOrder() {
                     <Input type="number" v-model="form.amount_paid" />
                   </div>
 
-                  <div>
-                    <Label>Total Change </Label>
-                    <Input readonly />
-                  </div>
 
-                  <DialogFooter>
+
+                  <DialogFooter class="mt-5">
                     <DialogClose asChild>
                       <Button variant="outline">Cancel</Button>
                     </DialogClose>
-                    <Button type="submit">Save changes</Button>
+                    <Button type="submit">Pay</Button>
                   </DialogFooter>
-                  </form>
-                </DialogContent>
-              
+                </form>
+              </DialogContent>
+
             </Dialog>
 
 
 
-            <Button>Cancel Order</Button>
+            <Button @click="deleteOrder">Cancel Order</Button>
 
 
 
@@ -323,5 +331,5 @@ function payOrder() {
     </div>
 
 
-  </div>
+  </CashierLayout>
 </template>

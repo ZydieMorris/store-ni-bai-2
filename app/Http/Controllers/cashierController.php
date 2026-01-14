@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\CartItem;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Order;
-use App\Models\OrderItem;
-use Illuminate\Support\Facades\DB;
 
 class cashierController extends Controller
 {
@@ -114,67 +112,58 @@ class cashierController extends Controller
         return redirect('/cashier/dashboard');
     }
 
- public function payOrder(Request $request)
-{
-   $validated = $request->validate([
-    'amount_paid' => 'required|numeric|min:0',
-]);
+    public function clearCart()
+    {
+        CartItem::where('user_id', auth()->id())->delete();
 
-$cartItems = CartItem::where('user_id', auth()->id())
-    ->with('product')
-    ->get();
-
-if ($cartItems->isEmpty()) {
-    return back()->withErrors('Cart is empty');
-}
-
-// Calculate total
-$totalAmount = $cartItems->sum(fn ($item) =>
-    $item->unit_price * $item->product_quantity
-);
-
-if ($validated['amount_paid'] < $totalAmount) {
-    return back()->withErrors('Insufficient payment');
-}
-
-$change = $validated['amount_paid'] - $totalAmount;
-
-DB::transaction(function () use ($cartItems, $validated, $totalAmount, $change) {
-
-    // 1️⃣ Create ONE order
-    $order = Order::create([
-        'user_id' => auth()->id(),
-        'amount_paid' => $validated['amount_paid'],
-        'total_amount' => $totalAmount,
-        'change_amount' => $change,
-        'status' => 'paid',
-    ]);
-
-    // 2️⃣ Create order items + deduct stock
-    foreach ($cartItems as $item) {
-
-        OrderItem::create([
-            'order_id' => $order->id,
-            'product_id' => $item->product_id,
-            'product_name' => $item->product->product_name,
-            'quantity' => $item->product_quantity,
-            'unit_price' => $item->unit_price,
-            'total_price' => $item->unit_price * $item->product_quantity,
-        ]);
-
-        $item->product->decrement(
-            'stock_available',
-            $item->product_quantity
-        );
+        return redirect('/cashier/dashboard');
     }
 
-    // 3️⃣ Clear cart
-    CartItem::where('user_id', auth()->id())->delete();
-});
+    public function payOrder(Request $request)
+    {
+        $validated = $request->validate([
+            'amount_paid' => 'required|numeric|min:0',
+        ]);
 
-return redirect('/cashier/dashboard')
-    ->with('success', 'Order paid successfully');
+        $cartItems = CartItem::where('user_id', auth()->id())->get();
 
-}
+        $totalAmount = $cartItems->sum(function ($item) {
+            return $item->unit_price * $item->product_quantity;
+        });
 
+        $changeAmount = $validated['amount_paid'] - $totalAmount;
+
+        $order = Order::create([
+            'user_id' => auth()->id(),
+            'amount_paid' => $request->amount_paid,
+            'total_amount' => $totalAmount,
+            'change_amount' => $changeAmount,
+            'status' => 'paid',
+        ]);
+
+        foreach ($cartItems as $cartItem) {
+            $product = $cartItem->product;
+            if ($product) {
+                $product->decrement('stock_available', $cartItem->product_quantity);
+            }
+        }
+
+        CartItem::where('user_id', auth()->id())->delete();
+
+        return redirect('/cashier/receipt'.'?order_id='.$order->id);
+    }
+
+    public function receipt(Request $request)
+    {
+        dd($request);
+
+        $order = Order::findOrFail($request->input('order_id'));
+
+        $cartItems = CartItem::with('product')->where('id', $order->id)->get();
+
+        return Inertia::render('cashier/Receipt', [
+            'order' => $order,
+            'cartItems' => $cartItems,
+        ]);
+    }
 }
