@@ -181,7 +181,7 @@ class cashierController extends Controller
 
     public function receipt(Request $request)
     {
-        $order = Order::with('orderItem')
+        $order = Order::with('orderItems.product')
             ->findOrFail($request->query('order_id'));
 
         return Inertia::render('cashier/Receipt', [

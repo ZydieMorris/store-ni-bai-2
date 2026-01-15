@@ -14,7 +14,7 @@ interface Order {
     amount_paid: number
     change_amount: number
     status: string
-    orderItems: OrderItem[]
+    order_items: Array<OrderItem & { product: any }>
 }
 
 
@@ -39,13 +39,11 @@ const { order } = defineProps<{ order: Order }>();
         <div class="w-300 mx-auto bg-amber-300 mt-20 h-100 p-5">
             <h1 class="text-center text-2xl font-bold">Receipt</h1>
 
-                
-
-            <div v-for="item in order.orderItems" :key="item.id">
+            <div v-for="item in order.order_items" :key="item.id">
                 <p> {{ item.product_name }}</p>
-                
-               
-                
+                <p>{{ item.id }}</p>
+                {{ item.unit_price }} / {{ item.product.price }}
+
             </div>
 
         </div>

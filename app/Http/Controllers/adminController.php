@@ -85,7 +85,7 @@ class adminController extends Controller
         $filename = time().'.'.$image->getClientOriginalExtension();
         $image->move(public_path('images'), $filename);
 
-        // Save product
+        
         Product::create([
             'product_name' => $validated['product_name'],
             'price' => $validated['price'],
