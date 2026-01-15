@@ -160,8 +160,8 @@ function editCategory(id: number) {
                                             <!-- Form inside dialog content -->
                                             <form @submit.prevent="editCategory(category.id)" class="mt-4 space-y-4">
                                                 <div class="grid gap-2">
-                                                    <Label for="category_name">Category Name</Label>
-                                                    <Input id="category_name" v-model="form.category_name" />
+                                                    <Label >Category Name</Label>
+                                                    <Input  v-model="form.category_name" />
                                                 </div>
 
                                                 <DialogFooter class="flex justify-end gap-2">

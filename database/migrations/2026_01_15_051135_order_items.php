@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order_items', function (Blueprint $table) {
+         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
 
             // Foreign keys
@@ -24,10 +24,10 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             // Snapshot of product data
-            $table->string('product_name')->nullable();
-            $table->integer('quantity');               // quantity is integer
-            $table->decimal('unit_price', 10, 2);      // unit price at purchase time
-            $table->decimal('total_price', 10, 2);     // quantity * unit_price
+            $table->string('product_name');          // Product name at time of order
+            $table->integer('quantity');             // Number of units purchased
+            $table->decimal('unit_price', 10, 2);    // Price per unit at purchase
+            $table->decimal('total_price', 10, 2);   // quantity * unit_price
 
             $table->timestamps();
         });
@@ -38,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_items');
+        //
     }
 };

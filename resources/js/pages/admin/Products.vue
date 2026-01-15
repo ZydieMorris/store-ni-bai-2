@@ -100,7 +100,7 @@ const changeCategory = (categoryId: number) => {
               ? 'border-b-2 border-[#254F81] text-[#254F81]'
               : 'text-gray-400'">
             {{ category.category_name }}
-          </button>
+          </button> 
         </div>
 
         <div class=" ">
@@ -118,8 +118,6 @@ const changeCategory = (categoryId: number) => {
 
         <div v-if="activeCategoryId !== null" class="text-center text-[#254F81] font-semibold text-3xl   ">
           {{categories.find(c => c.id === activeCategoryId)?.category_name}}
-
-
 
         </div>
 

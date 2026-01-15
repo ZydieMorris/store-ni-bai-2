@@ -13,4 +13,14 @@ class Order extends Model
         'change_amount',
         'status',
     ];
+
+    public function orderItem()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
