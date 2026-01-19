@@ -16,18 +16,36 @@ class cashierController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
+   public function index(Request $request)
+{
+    $searchTerm = $request->query('search');
 
-        $categories = ProductCategory::with('products')->get();
-        $cartItems = CartItem::where('user_id', auth()->id())->with('product')->get();
+   $categories = ProductCategory::query()
+    ->when($searchTerm, function ($query, $searchTerm) {
+        $query->whereHas('products', function ($q) use ($searchTerm) {
+            $q->where('product_name', 'like', "%{$searchTerm}%");
+        });
+    })
+    ->with(['products' => function ($q) use ($searchTerm) {
+        if ($searchTerm) {
+            $q->where('product_name', 'like', "%{$searchTerm}%");
+        }
+    }])
+    ->get();
 
-        return Inertia::render('cashier/Dashboard', [
-            'categories' => $categories,
-            'cartItems' => $cartItems,
 
-        ]);
-    }
+    $cartItems = CartItem::where('user_id', auth()->id())
+        ->with('product')
+        ->get();
+
+    return Inertia::render('cashier/Dashboard', [
+        'categories' => $categories,
+        'cartItems' => $cartItems,
+        'searchTerm' => $searchTerm,
+    ]);
+}
+
+
 
     public function addToCart(Request $request)
     {
@@ -57,11 +75,16 @@ class cashierController extends Controller
 
     }
 
-    public function showCart() {}
+    public function orderHistory() {
+       $orders = Order::where('user_id', auth()->id())->with('orderItems.product')->latest()->get();
 
-    /**
-     * Show the form for creating a new resource.
-     */
+        return Inertia::render('cashier/PurchaseHistory', [
+                'orders' => $orders,
+        ]);
+
+    }
+
+
     public function create()
     {
         //
@@ -78,10 +101,14 @@ class cashierController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show()
     {
-        //
-    }
+    //     $categories = ProductCategory::all();
+
+    //     return Inertia::render('cashier/Dashboard', [
+    //         'categories' => $categories,
+    //     ]);
+     }
 
     /**
      * Show the form for editing the specified resource.

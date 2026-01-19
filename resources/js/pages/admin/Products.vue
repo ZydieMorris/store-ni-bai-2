@@ -89,7 +89,7 @@ const changeCategory = (categoryId: number) => {
 <template>
   <AdminLayout>
 
-    <div class="flex   ml-100 relative w-350  ">
+    <div class="flex   ml-100 relative w-250 ">
       <!-- Tab Area -->
       <div class=" flex justify-between mt-35  space-x-15 w-full ">
 
@@ -100,7 +100,7 @@ const changeCategory = (categoryId: number) => {
               ? 'border-b-2 border-[#254F81] text-[#254F81]'
               : 'text-gray-400'">
             {{ category.category_name }}
-          </button> 
+          </button>
         </div>
 
         <div class=" ">

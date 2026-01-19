@@ -1,33 +1,29 @@
 <script setup lang="ts">
-import Button from '@/components/ui/button/Button.vue';
-import Input from '@/components/ui/input/Input.vue';
-import { Link, router, useForm } from '@inertiajs/vue3';
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from '@/components/ui/native-select'
-import { onMounted, ref } from 'vue';
+import { computed, ref } from 'vue'
+import { Link , useForm, router } from '@inertiajs/vue3'
+import Button from '@/components/ui/button/Button.vue'
+import Input from '@/components/ui/input/Input.vue'
+import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
   DialogTrigger,
+    DialogClose,
 } from '@/components/ui/dialog'
-import { products } from '@/actions/App/Http/Controllers/adminController';
-
-import Label from '@/components/ui/label/Label.vue';
-
+import Label from '@/components/ui/label/Label.vue'
+import { Trash } from 'lucide-vue-next'
+import CashierLayout from '@/layouts/cashier/Cashier-Layout.vue'
 
 
 function logout() {
-  router.post('/logout');
+  router.post('/logout')
 }
 
-interface Products {
+interface Product {
   id: number
   product_name: string
   price: number
@@ -36,10 +32,10 @@ interface Products {
   image: string
 }
 
-interface Categories {
+interface Category {
   id: number
   category_name: string
-  products: Products[]
+  products: Product[]
 }
 
 interface CartItem {
@@ -47,51 +43,36 @@ interface CartItem {
   product_id: number
   product_quantity: number
   unit_price: number
-  product: Products
-
+  product: Product
 }
 
+const props = defineProps<{ categories: Category[], cartItems: CartItem[],  searchTerm: string | null;}>()
 
-const { categories, cartItems } = defineProps<{ categories: Categories[], cartItems: CartItem[] }>();
-
+const { categories, cartItems } = props
 
 const form = useForm({
   product_id: 0,
   unit_price: 0,
   product_quantity: 1,
-  amount_paid: 0
+  amount_paid: 0,
 })
 
-const noOrder = computed(() => cartItems.length === 0);
+const noOrder = computed(() => cartItems.length === 0)
 
-
-function addToCart(product: Products) {
-  form.product_id = product.id;
-  form.unit_price = product.price;
-  form.product_quantity = form.product_quantity;
-
-
+function addToCart(product: Product) {
+  form.product_id = product.id
+  form.unit_price = product.price
 
   form.post('/cart/add', {
-    onSuccess: () => {
-      window.location.reload();
-
-    }
+    onSuccess: () => window.location.reload(),
   })
 }
-
-
-import { computed } from 'vue'
-import { Trash } from 'lucide-vue-next';
-import CashierLayout from '@/layouts/cashier/Cashier-Layout.vue';
-
 
 const totalAmount = computed(() => {
   return cartItems.reduce((total, item) => {
     return total + item.unit_price * item.product_quantity
   }, 0)
 })
-
 
 function cancelOrder(cartItemId: number) {
   router.delete(`/cart/delete/${cartItemId}`)
@@ -102,17 +83,40 @@ function deleteOrder() {
 }
 
 function cashierPay() {
-
   router.post('/cashier/pay', {
-    amount_paid: form.amount_paid
-  }
-
-  )
+    amount_paid: form.amount_paid,
+  })
 }
+
+const selectedCategory = ref<null | number>(null)
+
+const filteredCategory = computed(() => {
+  if (!selectedCategory.value) return categories
+
+  return categories.filter((category: Category) => category.id === selectedCategory.value)
+})
+
+import { watchDebounced } from '@vueuse/core';
+
+const searchTerm = ref(props.searchTerm || '');
+
+watchDebounced(
+  searchTerm,
+  (newValue) => {
+    router.get('/cashier/dashboard', {
+      search: newValue,
+    }, {
+      replace: true,
+      preserveState: true,
+    })
+  },
+  { debounce: 1000 }
+);
 
 
 
 </script>
+
 <template>
   <CashierLayout class="max-w-[1920px] mx-auto min-h-screen bg-gray-300">
     <!-- Header -->
@@ -120,35 +124,41 @@ function cashierPay() {
     <!-- Search bar -->
     <div class="flex gap-5 mt-20 px-20">
       <div>
-        <Input placeholder="Search Item" class="bg-white w-100" />
+        <Input v-model="searchTerm"  placeholder="Search Item" class="bg-white w-100" />
       </div>
 
       <div class="bg-white rounded">
-        <NativeSelect>
-          <NativeSelectOption value="todo">
-            Todo
-          </NativeSelectOption>
-          <NativeSelectOption value="in-progress">
-            In Progress
-          </NativeSelectOption>
-          <NativeSelectOption value="done">
-            Done
-          </NativeSelectOption>
-          <NativeSelectOption value="cancelled">
-            Cancelled
-          </NativeSelectOption>
-        </NativeSelect>
+       <NativeSelect v-model="selectedCategory">
+  <NativeSelectOption value="">
+    All Categories
+  </NativeSelectOption>
+
+  <NativeSelectOption
+    v-for="category in categories"
+    :key="category.id"
+    :value="category.id"
+  >
+    {{ category.category_name }}
+  </NativeSelectOption>
+</NativeSelect>
+
+
+
       </div>
 
     </div>
     <!-- Main -->
     <div class="px-20 mt-5 space-y-5 flex space-x-20">
 
+        <!-- <div v-for="items in filteredCategory" :key="items.id">
+                {{ items.products }}
+        </div> -->
+
 
       <!-- Products -->
       <div class="w-full max-w-5xl px-10 py-6  rounded-lg  bg-white">
 
-        <div v-for="category in categories" :key="category.id" class="flex flex-col   gap-4 mb-8">
+        <div v-for="category in filteredCategory" :key="category.id" class="flex flex-col   gap-4 mb-8">
           <div class="flex justify-between bg-blue-400 px-5">
             <div class="text-lg text-white font-semibold">
               {{ category.category_name }}

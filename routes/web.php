@@ -37,15 +37,11 @@ Route::middleware(['auth', 'verified', 'cashier'])->group(function () {
     Route::post('/cart/add', [cashierController::class, 'addToCart']);
     Route::get('/cart/show', [cashierController::class, 'showCart']);
     Route::delete('/cart/delete/{cartItem}', [cashierController::class, 'deleteCartItems']);
-
-    // Handles form submission / payment
     Route::post('/cashier/pay', [CashierController::class, 'payOrder'])->name('cashier.pay');
-
-    // Displays the receipt page
     Route::get('/cashier/receipt', [CashierController::class, 'receipt'])->name('cashier.receipt');
-
     Route::delete('/cart/clear', [cashierController::class, 'clearCart']);
-    // Route::get('/cashier/receipt', [cashierController::class, 'receipt']);
+    Route::get('/cashier/purchase-history', [cashierController::class, 'orderHistory']);
+
 
 });
 
