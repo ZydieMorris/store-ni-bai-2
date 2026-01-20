@@ -54,28 +54,22 @@ const toggleOrder = (orderId: number) => {
         </div>
 
             <div class="w-300 mx-auto mt-5 h-auto bg-white rounded-lg p-10 space-y-5">
-                    <div v-for="order in orders" :key="order.id" class="bg-[#254F81] rounded">
-                            <button @click="toggleOrder(order.id)" class="w-full flex  justify-between p-5 ">
+                <div v-for="order in orders" :key="order.id" class="bg-[#254F81] rounded">
+    <button @click="toggleOrder(order.id)" class="w-full flex justify-between p-5">
+        <div class="text-start">
+            <p class="font-bold"> Order ID: {{ order.id }}</p>
+            <p class="font-bold">Status: {{ order.status }}</p>
+            <p class="font-bold">Total Amount: {{ order.total_amount }}</p>
+        </div>
+    </button>
 
-                                    <div class="text-start">
-                                        <p class="font-bold"> Order ID: {{ order.id }}</p>
-                                        <p class="font-bold">Status: {{ order.status }}</p>
-                                        <p class="font-bold">Total Amount: {{ order.total_amount }}</p>
-                                    </div>
+    <div v-if="activeOrderId === order.id">
+        <div v-for="item in order.order_items" :key="item.id" class="p-5">
+            {{ item.product_name }} x {{ item.quantity }}
+        </div>
+    </div>
+</div>
 
-                                    <div class="flex items-center">
-                                        {{ order.created_at }}
-                                    </div>
-                            </button>
-
-                            <div v-if="activeOrderId === order.id">
-                                    <div v-for="item in order.order_items" :key="item.id" class="p-5">
-                                            {{ item.product.product_name }} x {{ item.quantity }}
-                                    </div>
-
-                            </div>
-
-                    </div>
 
             </div>
     </CashierLayout>

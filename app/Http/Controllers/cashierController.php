@@ -75,14 +75,18 @@ class cashierController extends Controller
 
     }
 
-    public function orderHistory() {
-       $orders = Order::where('user_id', auth()->id())->with('orderItems.product')->latest()->get();
+    public function orderHistory()
+{
+    $orders = Order::where('user_id', auth()->id())
+        ->with('orderItems')
+        ->latest()
+        ->get();
 
-        return Inertia::render('cashier/PurchaseHistory', [
-                'orders' => $orders,
-        ]);
+    return Inertia::render('cashier/PurchaseHistory', [
+        'orders' => $orders,
+    ]);
+}
 
-    }
 
 
     public function create()
@@ -168,7 +172,7 @@ class cashierController extends Controller
 
         DB::transaction(function () use ($cartItems, $totalAmount, $changeAmount, $request, &$order) {
 
-            // 3a️⃣ Create order
+            // Create order
             $order = Order::create([
                 'user_id' => auth()->id(),
                 'amount_paid' => $request->amount_paid,
@@ -177,7 +181,7 @@ class cashierController extends Controller
                 'status' => 'paid',
             ]);
 
-            // 3b️⃣ Create order items and decrement stock
+            // Create order items and decrement stock
             foreach ($cartItems as $cartItem) {
                 $product = $cartItem->product;
                 if (! $product) {

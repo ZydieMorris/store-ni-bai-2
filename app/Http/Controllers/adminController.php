@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\Product;
+use App\Models\OrderItem;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,7 +16,21 @@ class adminController extends Controller
      */
     public function index()
     {
-        return Inertia::render('admin/Dashboard');
+        $total_products = Product::count();
+        $total_sold_today = OrderItem::whereDate('created_at', today())->sum('quantity');
+        $product_low_stock = Product::where('stock_available', '<=', 0)->count();
+        $orders = Order::with('orderItems')->latest()->get();
+        $total_sales = OrderItem::whereDate('created_at', today())->sum('total_price');
+
+
+        return Inertia::render('admin/Dashboard',[
+            'total_products' => $total_products,
+            'total_sold_today' => $total_sold_today,
+            'product_low_stock' => $product_low_stock,
+             'orders' => $orders,
+             'total_sales'=> $total_sales,
+
+        ]);
     }
 
     /**
@@ -51,14 +67,6 @@ class adminController extends Controller
         return Inertia::render('admin/ManageStocks');
     }
 
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -85,7 +93,7 @@ class adminController extends Controller
         $filename = time().'.'.$image->getClientOriginalExtension();
         $image->move(public_path('images'), $filename);
 
-        
+
         Product::create([
             'product_name' => $validated['product_name'],
             'price' => $validated['price'],
@@ -139,17 +147,7 @@ class adminController extends Controller
         ]);
     }
 
-    public function show(string $id) {}
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id) {}
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ProductCategory $categories)
+       public function update(Request $request, ProductCategory $categories)
     {
         $validated = $request->validate([
             'category_name' => 'required',

@@ -89,7 +89,7 @@ const changeCategory = (categoryId: number) => {
 <template>
   <AdminLayout>
 
-    <div class="flex   ml-100 relative w-250 ">
+    <div class="flex   ml-80 relative ">
       <!-- Tab Area -->
       <div class=" flex justify-between mt-35  space-x-15 w-full ">
 
